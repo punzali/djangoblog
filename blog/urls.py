@@ -1,77 +1,88 @@
+
 from django.urls import path
-from . import views
+
+from .views import (
+    PostListView,
+    PostDetailView,
+    PostCreateView,
+    PostUpdateView,
+    PostDeleteView,
+    RegisterView,
+    MyPostsView,
+    about,
+    contact,
+    test_403,
+)
 
 
 urlpatterns = [
-
-    # =========================
-    # Home / Post List
-    # =========================
-
+    # Home page
     path(
         "",
-        views.PostListView.as_view(),
-        name="home"
+        PostListView.as_view(),
+        name="home",
     ),
 
+    # My posts
+    path(
+        "my-posts/",
+        MyPostsView.as_view(),
+        name="my_posts",
+    ),
 
-    # =========================
-    # Static Pages
-    # =========================
+    # Register
+    path(
+        "register/",
+        RegisterView.as_view(),
+        name="register",
+    ),
 
+    # Create post
+    path(
+        "posts/create/",
+        PostCreateView.as_view(),
+        name="post_create",
+    ),
+
+    # Post detail
+    path(
+        "posts/<slug:slug>/",
+        PostDetailView.as_view(),
+        name="post_detail",
+    ),
+
+    # Edit post
+    path(
+        "posts/<slug:slug>/edit/",
+        PostUpdateView.as_view(),
+        name="post_update",
+    ),
+
+    # Delete post
+    path(
+        "posts/<slug:slug>/delete/",
+        PostDeleteView.as_view(),
+        name="post_delete",
+    ),
+
+    # About page
     path(
         "about/",
-        views.about,
-        name="about"
+        about,
+        name="about",
     ),
 
+    # Contact page
     path(
         "contact/",
-        views.contact,
-        name="contact"
+        contact,
+        name="contact",
     ),
 
-
-    # =========================
-    # Create Post
-    # =========================
-
+    # Custom 403 error page test
     path(
-        "post/new/",
-        views.PostCreateView.as_view(),
-        name="post_create"
-    ),
-
-
-    # =========================
-    # Update Post
-    # =========================
-
-    path(
-        "post/<slug:slug>/edit/",
-        views.PostUpdateView.as_view(),
-        name="post_update"
-    ),
-
-
-    # =========================
-    # Delete Post
-    # =========================
-
-    path(
-        "post/<slug:slug>/delete/",
-        views.PostDeleteView.as_view(),
-        name="post_delete"
-    ),
-
-
-    # =========================
-    # Post Detail
-    # =========================
-
-    path(
-        "post/<slug:slug>/",
-        views.PostDetailView.as_view(),
-        name="post_detail"
+        "test-403/",
+        test_403,
+        name="test_403",
     ),
 ]

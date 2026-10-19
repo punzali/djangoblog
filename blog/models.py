@@ -1,4 +1,6 @@
+
 from django.db import models
+from django.conf import settings
 from django.utils.text import slugify
 
 from PIL import Image
@@ -42,6 +44,13 @@ class Post(models.Model):
 
     content = models.TextField()
 
+    # Author field
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="posts"
+    )
+
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
@@ -75,10 +84,8 @@ class Post(models.Model):
         auto_now=True
     )
 
-
     def __str__(self):
         return self.title
-
 
     def save(self, *args, **kwargs):
 

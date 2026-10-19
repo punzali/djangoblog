@@ -1,0 +1,75 @@
+
+{% extends "blog/base.html" %}
+
+{% block title %}Login | The Enchanted Library{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+
+            <div class="card shadow p-4">
+                <h2 class="text-center mb-4">Login</h2>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            Username or password is incorrect.
+                            Please try again.
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">
+                            Username
+                        </label>
+                        <input
+                            type="text"
+                            name="username"
+                            id="id_username"
+                            class="form-control"
+                            autocomplete="username"
+                            required
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            name="password"
+                            id="id_password"
+                            class="form-control"
+                            autocomplete="current-password"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        Login
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <a href="{% url 'password_reset' %}">
+                        Forgot Password?
+                    </a>
+                </div>
+
+                <div class="text-center mt-3">
+                    Don't have an account?
+                    <a href="{% url 'register' %}">Register</a>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
