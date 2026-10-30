@@ -44,7 +44,6 @@ class Post(models.Model):
 
     content = models.TextField()
 
-    # Author field
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -89,25 +88,27 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
 
-        # Create slug automatically
+        # Generate a unique slug for new posts
         if not self.slug:
-            self.slug = slugify(self.title)
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
 
-        # Save the post first
+            while Post.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.slug = slug
+
+        # Save the post
         super().save(*args, **kwargs)
 
         # Resize uploaded image
         if self.cover_image:
-
             img_path = self.cover_image.path
 
             img = Image.open(img_path)
 
-            # Resize only if image is larger than 800x800
             if img.height > 800 or img.width > 800:
-
-                img.thumbnail(
-                    (800, 800)
-                )
-
+                img.thumbnail((800, 800))
                 img.save(img_path)

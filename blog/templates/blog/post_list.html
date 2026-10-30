@@ -1,195 +1,502 @@
 {% extends "blog/base.html" %}
+{% load static %}
 
-{% block title %}
-{% endblock %}
+{% block title %}The Enchanted Library{% endblock %}
 
 {% block content %}
 
-<div class="container mt-4">
+<style>
+    .enchanted-home {
+        color: #f5edff;
+        padding-bottom: 20px;
+    }
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    /* Hero background image */
+    .enchanted-hero {
+        position: relative;
+        min-height: 340px;
+        margin: 0 0 24px;
+        padding: 45px 20px 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        overflow: hidden;
+        border-bottom: 1px solid #57318a;
+        background:
+            linear-gradient(
+                180deg,
+                rgba(12, 5, 25, .25),
+                rgba(8, 4, 18, .72)
+            ),
+            url("{% static 'blog/images/enchanted-bg.png' %}")
+            center 45% / cover no-repeat,
+            linear-gradient(180deg, #170a32, #0a0718);
+    }
 
-        <h1>The Enchanted Library</h1>
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+    }
 
-        <a
-            href="{% url 'post_create' %}"
-            class="btn btn-success"
-        >
-            Create New Post
-        </a>
+    .hero-title {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(34px, 5vw, 58px);
+        font-weight: 700;
+        color: #fff5ff;
+        text-shadow: 0 0 18px rgba(179, 105, 255, .9);
+        margin-bottom: 10px;
+    }
 
-    </div>
+    .hero-subtitle {
+        font-size: clamp(14px, 2vw, 19px);
+        color: #f0dcff;
+        text-shadow: 0 2px 7px #090311;
+        margin-bottom: 20px;
+    }
 
+    .hero-divider {
+        color: #e0baff;
+        font-size: 25px;
+        letter-spacing: 8px;
+    }
 
-    <div class="row g-4">
+    .filter-panel {
+        padding: 18px;
+        margin-bottom: 24px;
+        background: rgba(15, 10, 30, .97);
+        border: 1px solid #59327f;
+        border-radius: 10px;
+    }
 
-        {% for post in page_obj %}
+    .filter-panel .form-label {
+        color: #f0e5ff;
+        font-size: 13px;
+    }
 
-            <div class="col-md-6 col-lg-4">
+    .filter-panel .form-select,
+    .filter-panel .form-control {
+        min-height: 42px;
+        color: #f5edff;
+        background-color: #1b1234;
+        border: 1px solid #392354;
+        border-radius: 7px;
+        font-size: 13px;
+    }
 
-                <div class="card blog-card h-100 shadow-sm">
+    .filter-panel .form-select option {
+        background: #160d29;
+        color: white;
+    }
 
-                    {% if post.cover_image %}
-                        <img
-                            src="{{ post.cover_image.url }}"
-                            class="card-img-top blog-image"
-                            alt="{{ post.title }}"
-                        >
-                    {% endif %}
+    .filter-panel .form-control::placeholder {
+        color: #a89abd;
+    }
 
+    .filter-panel .form-control:focus,
+    .filter-panel .form-select:focus {
+        border-color: #a56aff;
+        box-shadow: 0 0 0 3px rgba(151, 79, 230, .15);
+    }
 
-                    <div class="card-body d-flex flex-column">
+    .btn-magic {
+        color: white !important;
+        background: linear-gradient(135deg, #8138e5, #5420aa);
+        border: 1px solid #8242d4;
+        border-radius: 7px;
+        padding: 9px 17px;
+        font-size: 13px;
+    }
 
-                        <h5 class="card-title">
-                            {{ post.title }}
-                        </h5>
+    .btn-magic:hover {
+        background: linear-gradient(135deg, #a05bf3, #6d2bc7);
+        border-color: #c79aff;
+        box-shadow: 0 0 16px rgba(151, 79, 230, .4);
+    }
 
-                        <p class="card-text">
-                            {{ post.content|truncatewords:20 }}
-                        </p>
+    .btn-clear {
+        display: inline-block;
+        color: #e5d2ff;
+        background: transparent;
+        border: 1px solid #8551b8;
+        border-radius: 7px;
+        padding: 9px 14px;
+        font-size: 13px;
+        text-decoration: none;
+    }
 
+    .btn-clear:hover {
+        color: white;
+        background: #291542;
+        border-color: #c18aff;
+    }
 
-                        {% if post.category %}
-                            <span class="badge bg-primary category-badge">
-                                {{ post.category.name }}
-                            </span>
+    .story-card {
+        height: 100%;
+        overflow: hidden;
+        background: linear-gradient(145deg, #130e25, #0d091b);
+        border: 1px solid #392052;
+        border-radius: 9px;
+        transition: transform .25s, border-color .25s;
+    }
+
+    .story-card:hover {
+        transform: translateY(-4px);
+        border-color: #9550e8;
+        box-shadow: 0 8px 25px rgba(102, 37, 170, .22);
+    }
+
+    .story-image {
+        display: block;
+        width: 100%;
+        height: 185px;
+        object-fit: cover;
+        background: #130e25;
+    }
+
+    .story-image-placeholder {
+        height: 185px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        background:
+            radial-gradient(circle, #48246f, transparent 65%),
+            linear-gradient(135deg, #1b1030, #080611);
+    }
+
+    .story-card .card-body {
+        display: flex;
+        flex-direction: column;
+        min-height: 190px;
+        padding: 15px;
+    }
+
+    .story-category {
+        align-self: flex-start;
+        display: inline-block;
+        max-width: 100%;
+        margin-top: -27px;
+        margin-bottom: 11px;
+        position: relative;
+        padding: 5px 12px;
+        color: white;
+        background: linear-gradient(135deg, #7832d2, #40147c);
+        border: 1px solid rgba(196, 148, 255, .3);
+        border-radius: 20px;
+        font-size: 11px;
+    }
+
+    .story-title {
+        color: #fff4ff;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 19px;
+        line-height: 1.4;
+        margin-bottom: 7px;
+        overflow-wrap: anywhere;
+    }
+
+    .story-description {
+        color: #c4b6d9;
+        font-size: 13px;
+        line-height: 1.7;
+        margin-bottom: 15px;
+    }
+
+    .story-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-top: auto;
+    }
+
+    .story-date {
+        color: #b7a5ce;
+        font-size: 11px;
+    }
+
+    .story-date span {
+        color: #c38cff;
+        margin-right: 5px;
+    }
+
+    .read-button {
+        flex-shrink: 0;
+        color: white !important;
+        background: linear-gradient(135deg, #7430ce, #4d1b9a);
+        border-radius: 6px;
+        padding: 7px 12px;
+        font-size: 12px;
+    }
+
+    .read-button:hover {
+        background: #873fe0;
+    }
+
+    .magic-pagination {
+        gap: 7px;
+        margin-top: 30px;
+    }
+
+    .magic-pagination .page-link {
+        min-width: 39px;
+        text-align: center;
+        color: #e9d8ff;
+        background: #100b20;
+        border: 1px solid #513072;
+        border-radius: 7px !important;
+        font-size: 13px;
+    }
+
+    .magic-pagination .page-item.active .page-link {
+        color: white;
+        background: linear-gradient(135deg, #a05af2, #7029cb);
+        border-color: #b783ff;
+    }
+
+    .magic-pagination .page-link:hover {
+        background: #30154b;
+        border-color: #a56aff;
+    }
+
+    .empty-state {
+        padding: 45px 20px;
+        text-align: center;
+        background: #110b20;
+        border: 1px solid #392052;
+        border-radius: 10px;
+        color: #d8c6ee;
+    }
+
+    @media (max-width: 767px) {
+        .enchanted-hero {
+            min-height: 245px;
+            padding: 35px 15px;
+            background-position: center center;
+        }
+
+        .filter-panel {
+            padding: 14px;
+        }
+
+        .story-image,
+        .story-image-placeholder {
+            height: 200px;
+        }
+    }
+</style>
+
+<div class="enchanted-home">
+
+    <!-- Hero -->
+    <section class="enchanted-hero">
+        <div class="hero-content">
+            <h1 class="hero-title">The Enchanted Library</h1>
+            <p class="hero-subtitle">
+                Stories, Magic &amp; Mysteries Await...
+            </p>
+            <div class="hero-divider" aria-hidden="true">
+                ──── ✧ ────
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+
+        <!-- Category Filter and Search -->
+        <form method="get" action="{% url 'home' %}"
+              class="filter-panel">
+
+            <div class="row g-3 align-items-end">
+
+                <div class="col-lg-4 col-md-5">
+                    <label for="category" class="form-label">
+                        Filter by Category
+                    </label>
+
+                    <select name="category" id="category"
+                            class="form-select">
+
+                        <option value="">All Categories</option>
+
+                        {% for category in categories %}
+                            <option
+                                value="{{ category.id }}"
+                                {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}
+                            >
+                                {{ category.name }}
+                            </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div class="col-lg-4 col-md-5">
+                    <label for="q" class="form-label">
+                        Search Posts
+                    </label>
+
+                    <input
+                        type="search"
+                        name="q"
+                        id="q"
+                        class="form-control"
+                        placeholder="Search title or content..."
+                        value="{{ search_query }}"
+                    >
+                </div>
+
+                <div class="col-lg-2 col-md-2">
+                    <button type="submit"
+                            class="btn btn-magic w-100">
+                        Search
+                    </button>
+                </div>
+
+                <div class="col-lg-2 col-md-12">
+                    <a href="{% url 'home' %}"
+                       class="btn btn-clear w-100">
+                        ✕ Clear Filters
+                    </a>
+                </div>
+
+            </div>
+        </form>
+
+        <!-- Story Cards -->
+        <div class="row g-4">
+
+            {% for post in page_obj %}
+
+                <div class="col-md-6 col-lg-4">
+
+                    <article class="card story-card">
+
+                        {% if post.cover_image %}
+                            <img
+                                src="{{ post.cover_image.url }}"
+                                class="story-image"
+                                alt="{{ post.title }}"
+                                loading="lazy"
+                            >
+                        {% else %}
+                            <div class="story-image-placeholder"
+                                 aria-hidden="true">
+                                ✨
+                            </div>
                         {% endif %}
 
+                        <div class="card-body">
 
-                        <div class="mt-auto pt-3">
+                            {% if post.category %}
+                                <span class="story-category">
+                                    {{ post.category.name }}
+                                </span>
+                            {% endif %}
 
-                            <a
-                                href="{% url 'post_detail' post.slug %}"
-                                class="btn btn-primary"
-                            >
-                                Read More
-                            </a>
+                            <h2 class="story-title">
+                                {{ post.title }}
+                            </h2>
 
+                            <p class="story-description">
+                                {{ post.content|truncatewords:22 }}
+                            </p>
+
+                            <div class="story-bottom">
+
+                                <span class="story-date">
+                                    <span>▦</span>
+                                    {{ post.created_at|date:"Y-m-d" }}
+                                </span>
+
+                                <a
+                                    href="{% url 'post_detail' post.slug %}"
+                                    class="btn read-button"
+                                >
+                                    Read More →
+                                </a>
+
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+            {% empty %}
+
+                <div class="col-12">
+                    <div class="empty-state">
+                        <div style="font-size: 40px; margin-bottom: 12px;">
+                            🔮
                         </div>
 
+                        <h2 class="h4">No Stories Found</h2>
+
+                        <p class="mb-3">
+                            No stories match your search. Try another
+                            category or search term.
+                        </p>
+
+                        <a href="{% url 'home' %}"
+                           class="btn btn-magic">
+                            Explore All Stories
+                        </a>
                     </div>
-
-
-                    <div class="card-footer text-muted">
-                        {{ post.created_at|date:"Y-m-d" }}
-                    </div>
-
                 </div>
 
-            </div>
+            {% endfor %}
 
-        {% empty %}
+        </div>
 
-            <div class="col-12">
+        <!-- Pagination -->
+        {% if is_paginated %}
 
-                <div class="alert alert-info">
-                    No posts available.
-                </div>
+            <nav aria-label="Page navigation">
+                <ul class="pagination magic-pagination justify-content-center">
 
-            </div>
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a
+                                class="page-link"
+                                href="?{% if selected_category %}category={{ selected_category|urlencode }}&amp;{% endif %}{% if search_query %}q={{ search_query|urlencode }}&amp;{% endif %}page={{ page_obj.previous_page_number }}"
+                                aria-label="Previous page"
+                            >
+                                ‹
+                            </a>
+                        </li>
+                    {% endif %}
 
-        {% endfor %}
+                    {% for number in page_obj.paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == number %}active{% endif %}">
+                            <a
+                                class="page-link"
+                                href="?{% if selected_category %}category={{ selected_category|urlencode }}&amp;{% endif %}{% if search_query %}q={{ search_query|urlencode }}&amp;{% endif %}page={{ number }}"
+                            >
+                                {{ number }}
+                            </a>
+                        </li>
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a
+                                class="page-link"
+                                href="?{% if selected_category %}category={{ selected_category|urlencode }}&amp;{% endif %}{% if search_query %}q={{ search_query|urlencode }}&amp;{% endif %}page={{ page_obj.next_page_number }}"
+                                aria-label="Next page"
+                            >
+                                ›
+                            </a>
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+
+        {% endif %}
 
     </div>
-
-
-    <!-- Pagination -->
-
-    {% if is_paginated %}
-
-        <nav aria-label="Page navigation" class="mt-4">
-
-            <ul class="pagination justify-content-center">
-
-                {% if page_obj.has_previous %}
-
-                    <li class="page-item">
-
-                        <a
-                            class="page-link"
-                            href="?page={{ page_obj.previous_page_number }}"
-                        >
-                            Previous
-                        </a>
-
-                    </li>
-
-                {% endif %}
-
-
-                <li class="page-item active">
-
-                    <span class="page-link">
-                        {{ page_obj.number }}
-                    </span>
-
-                </li>
-
-
-                {% if page_obj.has_next %}
-
-                    <li class="page-item">
-
-                        <a
-                            class="page-link"
-                            href="?page={{ page_obj.next_page_number }}"
-                        >
-                            Next
-                        </a>
-
-                    </li>
-
-                {% endif %}
-
-            </ul>
-
-        </nav>
-
-    {% endif %}
-
 </div>
-
-
-<style>
-
-    /* All blog images same size */
-    .blog-image {
-        width: 100%;
-        height: 250px;
-        object-fit: cover;
-    }
-
-
-    /* All cards same height */
-    .blog-card {
-        height: 100%;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-
-    /* Card content */
-    .blog-card .card-body {
-        min-height: 250px;
-    }
-
-
-    .card-title {
-        font-size: 22px;
-        font-weight: 600;
-    }
-
-
-    .card-text {
-        font-size: 16px;
-        line-height: 1.6;
-    }
-
-
-    .category-badge {
-        align-self: flex-start;
-    }
-
-</style>
 
 {% endblock %}

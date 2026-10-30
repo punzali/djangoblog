@@ -82,3 +82,5 @@ if settings.DEBUG:
 
 
 handler403 = "blog.views.custom_403"
+handler404 = "blog.views.custom_404"
+

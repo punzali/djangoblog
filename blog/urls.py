@@ -12,6 +12,8 @@ from .views import (
     about,
     contact,
     test_403,
+    test_404,
+    test_500,
 )
 
 
@@ -84,5 +86,15 @@ urlpatterns = [
         "test-403/",
         test_403,
         name="test_403",
+    ),
+    path(
+        "test-404/",
+        test_404,
+        name="test_404",
+    ),
+    path(
+        "test-500/",
+        test_500,
+        name="test_500",
     ),
 ]
